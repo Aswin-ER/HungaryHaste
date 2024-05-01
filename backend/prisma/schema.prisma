@@ -18,3 +18,5 @@ model User {
   password String 
   phone_number String @unique
 }
+
+
