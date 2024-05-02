@@ -5,6 +5,14 @@ import React, { FC, useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import * as Yup from "yup";
+import debounce from "lodash/debounce";
+
+interface tsUser {
+  name: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+}
 
 const Signin: FC = () => {
   const router = useRouter();
@@ -13,6 +21,31 @@ const Signin: FC = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+
+  const debouncedSubmit = debounce((values: tsUser) => {
+    axiosInstance
+      .post("/signup", {
+        email: values?.email,
+        password: values?.password,
+        phone: values?.phoneNumber,
+        name: values?.name,
+      })
+      .then((res: any) => {
+        if (res.status === 200) {
+          toast.success(res?.data?.message, { autoClose: 3000 });
+          setTimeout(() => {
+            router.push("/");
+          }, 3000);
+        } else {
+          toast.error(res?.data?.message);
+          console.log(`Error ${res.data}`);
+        }
+      })
+      .finally(() => {
+        setIsSubmittingForm(false); // Reset button state after API call completes
+      });
+  }, 3000);
 
   //Yup
   const phoneRegExp = /^(\+\d{1,3}[- ]?)?\d{10}$/;
@@ -66,25 +99,9 @@ const Signin: FC = () => {
               setName(values?.name);
               setPassword(values?.password);
               setPhone(values?.phoneNumber);
+              setIsSubmittingForm(true); // Set button state to disable during API call
 
-              axiosInstance
-                .post("/signup", {
-                  email: values?.email,
-                  password: values?.password,
-                  phone: values?.phoneNumber,
-                  name: values?.name,
-                })
-                .then((res: any) => {
-                  if (res.status === 200) {
-                    toast.success(res?.data?.message, { autoClose: 3000 });
-                    setTimeout(() => {
-                      router.push("/");
-                    }, 3000);
-                  } else {
-                    toast.error(res?.data?.message);
-                    console.log(`Error ${res.data}`);
-                  }
-                });
+              debouncedSubmit(values);
 
               console.log(values, "values from formik");
               setSubmitting(false);
@@ -177,7 +194,7 @@ const Signin: FC = () => {
                 <div className="w-1/2 mt-4">
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isSubmittingForm}
                     className="w-full lg:px-1 py-2 mobile:text-sm text-lg lg:text-xl font-medium text-white transition-colors duration-200 transform bg-black rounded-lg hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
                   >
                     Submit

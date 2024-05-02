@@ -5,11 +5,40 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import * as Yup from "yup";
 import axiosInstance from "../utils/axios";
+import debounce from "lodash/debounce";
 
 const SignIn: FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const router = useRouter();
+
+  const debouncedSubmit = debounce((values) => {
+    axiosInstance
+      .post("/signin", {
+        email: values?.email,
+        password: values?.password,
+      })
+      .then((res: any) => {
+        if (res.status === 200 && res?.data?.success === true) {
+          toast.success(res?.data?.message, {
+            autoClose: 3000,
+          });
+          setTimeout(() => {
+            router.push("/");
+          }, 3000);
+        } else {
+          toast.error(res?.data?.message);
+          console.log(`Error ${res.data}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Unexpected error:", error);
+      })
+      .finally(() => {
+        setIsSubmittingForm(false); // Reset button state after API call completes
+      });
+  }, 1000);
 
   const emailRegExp =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -51,25 +80,8 @@ const SignIn: FC = () => {
             onSubmit={(values, { setSubmitting }) => {
               setEmail(values?.email);
               setPassword(values?.password);
-
-              axiosInstance
-                .post("/signin", {
-                  email: values?.email,
-                  password: values?.password,
-                })
-                .then((res: any) => {
-                  if (res.status === 200) {
-                    toast.success(res?.data?.message, {
-                      autoClose: 3000,
-                    });
-                    setTimeout(() => {
-                      router.push("/");
-                    }, 3000);
-                  } else {
-                    toast.error(res?.data?.message);
-                    console.log(`Error ${res.data}`);
-                  }
-                });
+              setIsSubmittingForm(true); // Set button state to disable during API call
+              debouncedSubmit(values);
 
               console.log(values, "values from formik");
               setSubmitting(false);
@@ -126,7 +138,7 @@ const SignIn: FC = () => {
                 <div className="w-1/2 mt-5">
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isSubmittingForm}
                     className="w-full lg:px-1 py-2 mobile:text-sm text-lg lg:text-xl font-medium text-white transition-colors duration-200 transform bg-black rounded-lg hover:bg-gray-700 focus:outline-none focus:bg-gray-700"
                   >
                     Submit

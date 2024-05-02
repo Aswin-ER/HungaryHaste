@@ -53,7 +53,7 @@ const userController = {
       const user: UserTs | null = await userRepo.userSignin(email, password);
 
       if (!user) {
-        res.status(400).json({
+        return res.status(200).json({
           success: false,
           data: "",
           message: "Invalid user!",
@@ -77,7 +77,7 @@ const userController = {
           });
         }
       } else {
-        return res.status(400).json({
+        return res.status(200).json({
           success: false,
           data: "",
           message: "Invalid password!",
