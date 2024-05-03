@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import { PrismaClient } from '@prisma/client'
 import routes from './routes/userRoute';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const prisma = new PrismaClient()
 import cors from 'cors'; // Import cors middleware

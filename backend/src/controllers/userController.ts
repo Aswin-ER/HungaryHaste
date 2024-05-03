@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User, { UserTs } from "../service/userServices";
 import bcrypt from "bcrypt";
+import funJwt from "../utils/funJwt";
 
 const userController = {
   // Signup user
@@ -63,26 +64,28 @@ const userController = {
       if (user?.password) {
         const validPassword = await bcrypt.compare(password, user?.password);
 
-        if (validPassword) {
-          const {
-            password: userPassword,
-            id,
-            user_id,
-            ...clientUserInfo
-          } = user;
+        if (!validPassword) {
           return res.status(200).json({
-            success: true,
-            data: clientUserInfo,
-            message: "Signin Successfully!",
+            success: false,
+            data: "",
+            message: "Invalid password!",
           });
         }
-      } else {
+
+        //get tokens and give to client
+        const { token, accessToken, refershToken } = await funJwt(
+          user?.user_name
+        );
+
+        const { password: userPassword, id, user_id, ...clientUserInfo } = user;
+
         return res.status(200).json({
-          success: false,
-          data: "",
-          message: "Invalid password!",
+          success: true,
+          data: { clientUserInfo, token, accessToken, refershToken },
+          message: "Signin Successfully!",
         });
       }
+
     } catch (error) {
       console.error(error);
       res.status(500).json({
