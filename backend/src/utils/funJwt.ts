@@ -1,31 +1,41 @@
 import jwt from "jsonwebtoken";
 const crypto = require("crypto");
 
+interface tsToken {
+  access_token: string;
+  refresh_token: string;
+}
+
 const funJwt = (user_name: string) => {
   if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined");
   }
 
-  // normal token
-  const token = jwt.sign({ user_name }, process.env.JWT_SECRET, {
+  // access token
+  const access_token = jwt.sign({ user_name }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
 
-  //random string generation
-  const generateRandomString = (length: number) => {
-    return crypto
-      .randomBytes(Math.ceil(length / 2))
-      .toString("hex") // Convert to hexadecimal format
-      .slice(0, length); // Trim to desired length
+  if (!process.env.REFRESH_TOKEN_SECRET) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+
+  //refesh token
+  const refresh_token = jwt.sign(
+    { user_name },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: '3d'}
+  );
+
+
+  // setting tokens
+  const tokens: tsToken = {
+    access_token: access_token,
+    refresh_token: refresh_token,
   };
 
-  //access token
-  const accessToken = generateRandomString(64);
 
-  //refersh token
-  const refershToken = generateRandomString(64);
-
-  return { token: token, accessToken: accessToken, refershToken: refershToken };
+  return { tokens: tokens };
 };
 
 export default funJwt;

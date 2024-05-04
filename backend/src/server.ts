@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import { PrismaClient } from '@prisma/client'
+import cookieParser from 'cookie-parser';
 import routes from './routes/userRoute';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -11,7 +12,8 @@ import cors from 'cors'; // Import cors middleware
 const app = express();
 
 // Middleware
-app.use(cors()); // Enable CORS
+app.use(cookieParser());
+app.use(cors({ credentials: true, origin: 'http://localhost:3000'})); // Enable CORS
 app.use(bodyParser.json());
 app.use('/api', routes);
 

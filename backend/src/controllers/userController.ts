@@ -73,19 +73,63 @@ const userController = {
         }
 
         //get tokens and give to client
-        const { token, accessToken, refershToken } = await funJwt(
-          user?.user_name
-        );
+        const { tokens } = await funJwt(user?.user_name);
 
         const { password: userPassword, id, user_id, ...clientUserInfo } = user;
 
+        //set cookies
+        res.cookie("accessToken", tokens.access_token, {
+          httpOnly: true,
+          maxAge: 3600000, // 1hrs
+          path: "/",
+        });
+
+        res.cookie("refreshToken", tokens.refresh_token, {
+          httpOnly: true,
+          maxAge: 604800000, // 1week
+          path: "/",
+        });
+
         return res.status(200).json({
           success: true,
-          data: { clientUserInfo, token, accessToken, refershToken },
+          data: { clientUserInfo, tokens },
           message: "Signin Successfully!",
         });
       }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server Error!",
+      });
+    }
+  },
 
+  //refersh token
+  refreshToken: async (req: Request, res: Response) => {
+    try {
+      const { user_name } = req.body;
+
+      const { tokens } = await funJwt(user_name);
+
+      //set cookies
+      res.cookie("accessToken", tokens.access_token, {
+        httpOnly: true,
+        maxAge: 3600000, // 1hrs
+        path: "/",
+      });
+
+      res.cookie("refreshToken", tokens.refresh_token, {
+        httpOnly: true,
+        maxAge: 604800000, // 1week
+        path: "/",
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: { tokens },
+        message: "Token created Successfully!",
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({
