@@ -6,11 +6,13 @@ import "react-toastify/dist/ReactToastify.css";
 import * as Yup from "yup";
 import axiosInstance from "../utils/axios";
 import debounce from "lodash/debounce";
+import userStoreInstance from "@/store/userStore";
 
 const SignIn: FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+
   const router = useRouter();
 
   const debouncedSubmit = debounce((values) => {
@@ -24,6 +26,10 @@ const SignIn: FC = () => {
           toast.success(res?.data?.message, {
             autoClose: 3000,
           });
+
+          // add userDetails into mobx
+          userStoreInstance.setUser(res?.data?.data?.clientUserInfo);
+
           setTimeout(() => {
             router.push("/");
           }, 3000);

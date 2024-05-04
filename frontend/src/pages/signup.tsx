@@ -35,7 +35,7 @@ const Signin: FC = () => {
         if (res.status === 200) {
           toast.success(res?.data?.message, { autoClose: 3000 });
           setTimeout(() => {
-            router.push("/");
+            router.push("/signin");
           }, 3000);
         } else {
           toast.error(res?.data?.message);
