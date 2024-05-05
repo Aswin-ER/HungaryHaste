@@ -138,6 +138,35 @@ const userController = {
       });
     }
   },
+
+  logout: async (req: Request, res:Response)=> {
+    try {
+
+      res.clearCookie('accessToken', {
+        path: '/',
+        httpOnly: true,
+        expires: new Date(0)
+      })
+
+      res.clearCookie('refreshToken', {
+        path: '/',
+        httpOnly: true,
+        expires: new Date(0)
+      })
+
+      res.status(200).json({
+        success: true,
+        message: "Logout Successfully!",
+      });
+      
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server Error!",
+      });
+    }
+  }
 };
 
 export default userController;
