@@ -3,6 +3,9 @@ import Image from "next/image";
 import { Inter } from "next/font/google";
 import { useEffect, useState } from "react";
 import userStoreInstance from "@/store/userStore";
+import instance from "@/utils/axios";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 export interface tsUser {
@@ -12,11 +15,43 @@ export interface tsUser {
 }
 
 export default function Home() {
-  
+  const [isLoggedIn, setisLoggedIn] = useState("");
+
+  const router = useRouter();
+
   useEffect(() => {
-    const userDetails = localStorage.getItem("userDet");
+    const userDetails: any = localStorage.getItem("userDet");
+
+    if (!userDetails) {
+      return;
+    }
+    const { user_name } = JSON.parse(userDetails);
+
+    setisLoggedIn(user_name);
     console.log(userDetails, "userDetails");
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("userDet");
+
+    instance
+      .get("/logout")
+      .then((res) => {
+        if (res.status === 200) {
+          toast.success(res?.data?.message);
+          setisLoggedIn('');
+          setTimeout(() => {
+            router.push("/");
+          }, 3000);
+        } else {
+          console.log(`Error ${res?.data}`);
+        }
+      })
+
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <>
@@ -84,12 +119,21 @@ export default function Home() {
                 </a>
               </li>
               <li>
-                <a
-                  href="/signin"
-                  className="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:px-8 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                >
-                  <i className="fa-solid fa-user px-2"></i>Sign In
-                </a>
+                {isLoggedIn ? (
+                  <a
+                    onClick={handleLogout}
+                    className="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:px-8 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                  >
+                    <i className="fa-solid fa-user px-2"></i>Log out
+                  </a>
+                ) : (
+                  <a
+                    href="/signin"
+                    className="block py-2 px-3 text-lg text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 md:px-8 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                  >
+                    <i className="fa-solid fa-user px-2"></i>Sign In
+                  </a>
+                )}
               </li>
               <li>
                 <a
