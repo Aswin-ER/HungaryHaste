@@ -16,7 +16,7 @@ instance.interceptors.response.use(
     const orginalRequest = error.config;
 
     if (
-      error.response.status === 401 &&
+      error?.response?.status === 401 &&
       orginalRequest.url !== "/refersh_token"
     ) {
       try {
