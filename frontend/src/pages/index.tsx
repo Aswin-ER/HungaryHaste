@@ -7,6 +7,7 @@ import instance from "@/utils/axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import ResturantCards from "@/components/resturantCards";
+import SliderCard from "@/components/sliderCard";
 
 const inter = Inter({ subsets: ["latin"] });
 export interface tsUser {
@@ -148,6 +149,8 @@ export default function Home() {
           </div>
         </div>
       </nav>
+
+      <SliderCard/>
 
       <ResturantCards/>
     </>
