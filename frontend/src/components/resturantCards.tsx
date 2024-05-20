@@ -1,31 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 import instance from "@/utils/axios";
-import axios from "axios";
 import React, { FC, useEffect, useState } from "react";
 
 const ResturantCards: FC = () => {
   const [cards, setcards] = useState<any>([]);
 
-  const [city, setcity] = useState("");
-
   useEffect(() => {
-    const city = "Banglore";
-    const latitude = 28.6667;
-    const longitude = 77.2167;
+    const fetchCards = async () => {
+      try {
+        const res = await instance.get("getCards");
 
-    axios
-      .get(
-        `https://www.swiggy.com/mapi/homepage/getCards?lat=${latitude}&lng=${longitude}`,
-        {
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
-          },
-        }
-      )
-      .then((res) => {
         if (res?.status === 200) {
-          console.log(res.data);
+          console.log("Response data:", res.data);
 
           const fetchedCards =
             res.data.data?.success?.cards[4]?.gridWidget?.gridElements
@@ -34,30 +20,38 @@ const ResturantCards: FC = () => {
           // Ensure fetchedCards is an array
           const updatedCards = Array.isArray(fetchedCards)
             ? fetchedCards
-            : [fetchedCards];
-
-          console.log(updatedCards, "UPDATED CARDS");
+            : fetchedCards
+            ? [fetchedCards]
+            : [];
 
           setcards(updatedCards);
+        } else {
+          console.error("Unexpected response status:", res.status);
         }
-      });
+      } catch (error) {
+        console.error("Error fetching cards:", error);
+      }
+    };
+
+    fetchCards();
   }, []);
 
   return (
     <>
       <div className="container max-w-7xl mx-auto px-4 mt-20">
         <div className=" flex items-center">
-          <h2 className="font-bold text-3xl mr-auto ">
-            {`Top restaurant chains in ${city}`}
-          </h2>
+          <h2 className="font-bold text-3xl mr-auto ">{`Top Picks For You`}</h2>
         </div>
       </div>
-      {cards.map((item: any, key: any) => {
-        return (
-          <>
-            {/* <div key={key} className=" flex flex-row flex-wrap items-center mt-5"> */}
-              <div className="flex flex-row bg-white-50 px-4">
-                <div className="max-w-sm overflow-hidden rounded-xl bg-white shadow-md duration-200 hover:scale-105 hover:shadow-xl">
+      <div className="flex flex-wrap items-start mt-5 container max-w-7xl mx-auto px-4">
+        {cards.map((item: any) => {
+          return (
+            <>
+              <div
+                key={item?.id}
+                className="flex flex-row flex-wrap bg-white-50 px-4 mb-16"
+              >
+                <div className="max-w-sm flex-shrink-0 m-2 overflow-hidden rounded-xl bg-white shadow-md duration-200 hover:scale-105 hover:shadow-xl">
                   <img
                     src={`https://media-assets.swiggy.com/swiggy/image/upload/${item?.info?.cloudinaryImageId}`}
                     alt="plant"
@@ -71,7 +65,6 @@ const ResturantCards: FC = () => {
                       <p className="text-medium mr-2 text-gray-700 font-bold">
                         {item?.info?.avgRatingString}
                       </p>
-                      <div className="h-1 w-1 bg-gray-700 rounded-full mr-2"></div>
                       <p className="text-medium text-gray-700 font-bold">
                         {item?.info?.sla?.slaString}
                       </p>
@@ -85,10 +78,10 @@ const ResturantCards: FC = () => {
                   </div>
                 </div>
               </div>
-            {/* </div> */}
-          </>
-        );
-      })}
+            </>
+          );
+        })}
+      </div>
     </>
   );
 };

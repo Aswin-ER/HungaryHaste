@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User, { UserTs } from "../service/userServices";
 import bcrypt from "bcrypt";
 import funJwt from "../utils/funJwt";
+import axios from "axios";
 
 const userController = {
   // Signup user
@@ -139,26 +140,24 @@ const userController = {
     }
   },
 
-  logout: async (req: Request, res:Response)=> {
+  logout: async (req: Request, res: Response) => {
     try {
-
-      res.clearCookie('accessToken', {
-        path: '/',
+      res.clearCookie("accessToken", {
+        path: "/",
         httpOnly: true,
-        expires: new Date(0)
-      })
+        expires: new Date(0),
+      });
 
-      res.clearCookie('refreshToken', {
-        path: '/',
+      res.clearCookie("refreshToken", {
+        path: "/",
         httpOnly: true,
-        expires: new Date(0)
-      })
+        expires: new Date(0),
+      });
 
       res.status(200).json({
         success: true,
         message: "Logout Successfully!",
       });
-      
     } catch (error) {
       console.error(error);
       res.status(500).json({
@@ -166,7 +165,36 @@ const userController = {
         message: "Internal server Error!",
       });
     }
-  }
+  },
+
+  getCards: async (req: Request, res: Response) => {
+    try {
+
+      const userAgent = " Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
+
+      console.log({userAgent});
+      
+      const response = await axios.get(
+        "https://www.swiggy.com/mapi/homepage/getCards?lat=28.6667&lng=77.2167",
+        {
+          headers: {
+            "User-Agent": userAgent,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        res.json(response.data);
+      } else {
+        res.status(response.status).json({ message: "Failed to fetch data" });
+      }
+    } catch (error: any) {
+      res
+        .status(error.response?.status || 500)
+        .json({ message: error.message || 'Internal Server Error'});
+    }
+  },
 };
 
 export default userController;
