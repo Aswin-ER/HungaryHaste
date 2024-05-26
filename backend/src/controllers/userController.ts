@@ -106,7 +106,7 @@ const userController = {
     }
   },
 
-  //refersh token
+  //Refersh token
   refreshToken: async (req: Request, res: Response) => {
     try {
       const { user_name } = req.body;
@@ -140,6 +140,7 @@ const userController = {
     }
   },
 
+  //Logout
   logout: async (req: Request, res: Response) => {
     try {
       res.clearCookie("accessToken", {
@@ -167,15 +168,14 @@ const userController = {
     }
   },
 
+  //Get all restaurants
   getCards: async (req: Request, res: Response) => {
     try {
+      const userAgent =
+        " Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
 
-      const userAgent = " Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
-
-      console.log({userAgent});
-      
       const response = await axios.get(
-        "https://www.swiggy.com/mapi/homepage/getCards?lat=28.6667&lng=77.2167",
+        "https://www.swiggy.com/dapi/restaurants/list/v5?lat=10.51600&lng=76.21570&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING",
         {
           headers: {
             "User-Agent": userAgent,
@@ -192,7 +192,37 @@ const userController = {
     } catch (error: any) {
       res
         .status(error.response?.status || 500)
-        .json({ message: error.message || 'Internal Server Error'});
+        .json({ message: error.message || "Internal Server Error" });
+    }
+  },
+ 
+  //Get restaurant menus
+  getMenuCards: async (req: Request, res: Response) => {
+    try {
+      const id = req.params.id;
+            
+      const userAgent =
+        " Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
+
+      const response = await axios.get(
+        `https://www.swiggy.com/dapi/menu/pl?page-type=REGULAR_MENU&complete-menu=true&lat=10.51600&lng=76.21570&restaurantId=${id}`,
+        {
+          headers: {
+            "User-Agent": userAgent,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        res.json(response.data);
+      } else {
+        res.status(response.status).json({ message: "Failed to fetch data" });
+      }
+    } catch (error: any) {
+      res
+        .status(error.response?.status || 500)
+        .json({ message: error.message || "Internal Server Error" });
     }
   },
 };

@@ -14,4 +14,6 @@ userRouter.get("/logout", userController.logout);
 
 userRouter.get("/getCards", userController.getCards);
 
+userRouter.get("/menuCards/:id", userController.getMenuCards)
+
 export default userRouter;
