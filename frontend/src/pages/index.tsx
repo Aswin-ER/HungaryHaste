@@ -2,7 +2,6 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
 import { useEffect, useState } from "react";
-import userStoreInstance from "@/store/userStore";
 import instance from "@/utils/axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
