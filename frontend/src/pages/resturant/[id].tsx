@@ -7,7 +7,17 @@ const HotelDetail = () => {
   const router = useRouter();
   const { id } = router.query;
   const [hotel, setHotel] = useState<any>([]);
+
   const [menu, setMenu] = useState<any>([]);
+  const [title, setTitle] = useState<any>("");
+
+  const [menu2, setMenu2] = useState<any>([]);
+  const [title2, setTitle2] = useState<any>("");
+
+  const [menu3, setMenu3] = useState<any>([]);
+  const [title3, setTitle3] = useState<any>("");
+
+  // const [title, setTitle] = useState<any>([]);
 
   useEffect(() => {
     if (id) {
@@ -15,21 +25,34 @@ const HotelDetail = () => {
         try {
           const response: any = await instance.get(`/menuCards/${id}`);
 
-          console.log(response);
-
           if (response.status === 200) {
             const fetchedResturants: any =
-              response?.data?.data?.cards[0]?.card?.card;
-
-            console.log(fetchedResturants, "fetched resturants here!");
+              response?.data?.data?.cards[2]?.card?.card?.info;
             setHotel(fetchedResturants);
 
-            const fetchedMenus: any = response?.data?.data?.cards[5];
-            console.log(fetchedMenus, "fetchedMenus here!");
+            // carousel menus
+            const fetchedMenus: any =
+              response?.data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR
+                ?.cards;
+            setMenu(fetchedMenus);
 
-            if (Array.isArray(fetchedMenus)) {
-              setMenu(fetchedMenus);
-            }
+            // itemCards Menus
+            const fetchedMenus2: any =
+              response?.data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR
+                ?.cards;
+            setMenu2(fetchedMenus2);
+            // setTitle2(
+            //   response?.data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR
+            //     ?.cards?.card?.card?.title
+            // );
+
+            // categories Menus
+            const fetchedMenus3: any =
+              response?.data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR
+                ?.cards;
+            console.log(fetchedMenus3, "categories menus");
+            setMenu3(fetchedMenus3);
+            // setTitle3(fetchedMenus3[3]?.card?.card?.title);
           } else {
             console.error("Unexpected response status:", response.status);
           }
@@ -43,36 +66,164 @@ const HotelDetail = () => {
     }
   }, [id]);
 
+  // Price setting
+  const formatPrice = (price: number) => {
+    const priceStr = price.toString();
+    const length = priceStr.length;
+
+    if (length >= 2) {
+      return priceStr.slice(0, length - 2) + "." + priceStr.slice(length - 2);
+    }
+  };
+
   return (
     <>
-      <div className="container mx-auto p-4 bg-black">
-        <>
-          <h1 className="text-3xl font-bold mb-4 text-red-600">
-            {hotel?.text}
-          </h1>
-          <p className="text-red-600 mb-8 "></p>
-          <h2 className="text-2xl font-semibold mb-4">Menu</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="border p-4 rounded-lg shadow-md">
-              <img
-                src={`https://media-assets.swiggy.com/swiggy/image/upload/`}
-                alt="Food"
-                className="w-full h-48 object-cover rounded-t-lg"
-              />
-              <>
-                <div className="p-2">
-                  <h3 className="text-lg font-bold">
-                    
+      <div className="container mx-auto p-4 bg-white">
+        <h1 className="text-3xl font-bold mb-4">{hotel?.name}</h1>
+        <p className=" mb-8 ">
+          {hotel?.city}, {hotel?.locality}, {hotel?.areaName}
+        </p>
+        <h2 className="text-2xl font-bold mb-4">Menu</h2>
+
+        {/*Menus */}
+        {menu &&
+          menu.map((item: any, index: number) => {
+            return (
+              <div key={index}>
+                {item?.card?.card?.carousel?.length > 0 && (
+                  <h3 className="text-2xl font-semibold mb-4 mt-6 text-red-600">
+                    {item?.card?.card?.carousel[0]?.card?.info?.category}
                   </h3>
-                  <p className="text-gray-600">asdf</p>
-                  <p className="text-xl font-semibold">asdf</p>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {item?.card?.card?.carousel?.map(
+                    (carousel: any, cardIndex: number) => {
+                      return (
+                        <div
+                          key={cardIndex}
+                          className="border p-4 rounded-lg shadow-md"
+                        >
+                          <img
+                            src={`https://media-assets.swiggy.com/swiggy/image/upload/${carousel?.dish?.info?.imageId}`}
+                            alt="Food"
+                            className="w-full h-48 object-cover rounded-t-lg"
+                          />
+                          <div className="p-2">
+                            <h3 className="text-lg text-red-600 font-bold">
+                              {carousel?.dish?.info?.name}
+                            </h3>
+                            <p className="text-gray-600">
+                              {carousel?.dish?.info?.category}
+                            </p>
+                            <p className="text-xl font-semibold">
+                              {formatPrice(carousel?.dish?.info?.price)}₹
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                  )}
                 </div>
-              </>
+              </div>
+            );
+          })}
+
+        {/*Menus2 */}
+
+        {menu2
+          ? menu2.map((item: any, index: number) => {
+              return (
+                <div key={index}>
+                  {item?.card?.card?.itemCards?.length > 0 && (
+                    <h3 className="text-2xl font-semibold mb-4 mt-6 text-red-600">
+                      {item?.card?.card?.itemCards[0]?.card?.info?.category}
+                    </h3>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {item?.card?.card?.itemCards?.map(
+                      (itemCards: any, cardIndex: number) => {
+                        return (
+                          <>
+                            <div
+                              key={cardIndex}
+                              className="border p-4 rounded-lg shadow-md"
+                            >
+                              <img
+                                src={`https://media-assets.swiggy.com/swiggy/image/upload/${itemCards?.card?.info?.imageId}`}
+                                alt="Food"
+                                className="w-full h-48 object-cover rounded-t-lg"
+                              />
+                              <div className="p-2">
+                                <h3 className="text-lg text-red-600 font-bold">
+                                  {itemCards?.card?.info?.name}
+                                </h3>
+                                <p className="text-gray-600">
+                                  {itemCards?.card?.info?.category}
+                                </p>
+                                <p className="text-xl font-semibold">
+                                  {formatPrice(itemCards?.card?.info?.price)}₹
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
               );
-            </div>
-          </div>
-        </>
-        );
+            })
+          : ""}
+
+        {/*Menus3 */}
+
+        {menu3
+          ? menu3.map((item: any, index: number) => {
+              return (
+                <div key={index}>
+                  {item?.card?.card?.categories?.itemCards?.length > 0 && (
+                    <h3 className="text-2xl font-semibold mb-4 mt-6 text-red-600">
+                      {
+                        item?.card?.card?.categories?.itemCards[0]?.card?.info
+                          ?.category
+                      }
+                    </h3>
+                  )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {item?.card?.card?.categories?.itemCards?.map(
+                      (itemCards: any, cardIndex: number) => {
+                        return (
+                          <>
+                            <div
+                              key={cardIndex}
+                              className="border p-4 rounded-lg shadow-md"
+                            >
+                              <img
+                                src={`https://media-assets.swiggy.com/swiggy/image/upload/${itemCards?.card?.info?.imageId}`}
+                                alt="Food"
+                                className="w-full h-48 object-cover rounded-t-lg"
+                              />
+                              <div className="p-2">
+                                <h3 className="text-lg text-red-600 font-bold">
+                                  {itemCards?.card?.info?.name}
+                                </h3>
+                                <p className="text-gray-600">
+                                  {itemCards?.card?.info?.category}
+                                </p>
+                                <p className="text-xl font-semibold">
+                                  {formatPrice(itemCards?.card?.info?.price)}₹
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          : ""}
       </div>
     </>
   );
