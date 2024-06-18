@@ -7,17 +7,9 @@ const HotelDetail = () => {
   const router = useRouter();
   const { id } = router.query;
   const [hotel, setHotel] = useState<any>([]);
-
   const [menu, setMenu] = useState<any>([]);
-  const [title, setTitle] = useState<any>("");
-
   const [menu2, setMenu2] = useState<any>([]);
-  const [title2, setTitle2] = useState<any>("");
-
   const [menu3, setMenu3] = useState<any>([]);
-  const [title3, setTitle3] = useState<any>("");
-
-  // const [title, setTitle] = useState<any>([]);
 
   useEffect(() => {
     if (id) {
@@ -68,6 +60,9 @@ const HotelDetail = () => {
 
   // Price setting
   const formatPrice = (price: number) => {
+    if (!price) {
+      return;
+    }
     const priceStr = price.toString();
     const length = priceStr.length;
 
@@ -92,12 +87,15 @@ const HotelDetail = () => {
               <div key={index}>
                 {item?.card?.card?.carousel?.length > 0 && (
                   <h3 className="text-2xl font-semibold mb-4 mt-6 text-red-600">
-                    {item?.card?.card?.carousel[0]?.card?.info?.category}
+                    {item?.card?.card?.carousel[0]?.dish?.info?.imageId
+                      ? item?.card?.card?.carousel[0]?.card?.info?.category
+                      : ""}
                   </h3>
                 )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {item?.card?.card?.carousel?.map(
-                    (carousel: any, cardIndex: number) => {
+                  {item?.card?.card?.carousel
+                    ?.filter((carousel: any) => carousel?.dish?.info?.imageId)
+                    .map((carousel: any, cardIndex: number) => {
                       return (
                         <div
                           key={cardIndex}
@@ -121,27 +119,30 @@ const HotelDetail = () => {
                           </div>
                         </div>
                       );
-                    }
-                  )}
+                    })}
                 </div>
               </div>
             );
           })}
 
         {/*Menus2 */}
-
         {menu2
           ? menu2.map((item: any, index: number) => {
               return (
                 <div key={index}>
                   {item?.card?.card?.itemCards?.length > 0 && (
                     <h3 className="text-2xl font-semibold mb-4 mt-6 text-red-600">
-                      {item?.card?.card?.itemCards[0]?.card?.info?.category}
+                      {item?.card?.card?.itemCards[0]?.card?.info?.imageId
+                        ? item?.card?.card?.itemCards[0]?.card?.info?.category
+                        : ""}
                     </h3>
                   )}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {item?.card?.card?.itemCards?.map(
-                      (itemCards: any, cardIndex: number) => {
+                    {item?.card?.card?.itemCards
+                      ?.filter(
+                        (itemCards: any) => itemCards?.card?.info?.imageId
+                      )
+                      .map((itemCards: any, cardIndex: number) => {
                         return (
                           <>
                             <div
@@ -167,8 +168,7 @@ const HotelDetail = () => {
                             </div>
                           </>
                         );
-                      }
-                    )}
+                      })}
                   </div>
                 </div>
               );
@@ -176,17 +176,17 @@ const HotelDetail = () => {
           : ""}
 
         {/*Menus3 */}
-
         {menu3
           ? menu3.map((item: any, index: number) => {
               return (
                 <div key={index}>
                   {item?.card?.card?.categories?.itemCards?.length > 0 && (
                     <h3 className="text-2xl font-semibold mb-4 mt-6 text-red-600">
-                      {
-                        item?.card?.card?.categories?.itemCards[0]?.card?.info
-                          ?.category
-                      }
+                      {item?.card?.card?.categories?.itemCards[0]?.card?.info
+                        .imageId
+                        ? item?.card?.card?.categories?.itemCards[0]?.card?.info
+                            ?.category
+                        : ""}
                     </h3>
                   )}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
