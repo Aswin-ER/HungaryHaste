@@ -73,12 +73,12 @@ const HotelDetail = () => {
 
   return (
     <>
-      <div className="container mx-auto p-4 bg-white">
+      <div className="container mx-auto p-4 bg-white mt-12 ml-8">
         <h1 className="text-3xl font-bold mb-4">{hotel?.name}</h1>
         <p className=" mb-8 ">
           {hotel?.city}, {hotel?.locality}, {hotel?.areaName}
         </p>
-        <h2 className="text-2xl font-bold mb-4">Menu</h2>
+        <h2 className="text-2xl font-bold mb-4 ml-2">Menu</h2>
 
         {/*Menus */}
         {menu &&

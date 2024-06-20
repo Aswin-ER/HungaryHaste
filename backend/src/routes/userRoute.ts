@@ -12,7 +12,7 @@ userRouter.post("/refresh_token", userController.refreshToken);
 
 userRouter.get("/logout", userController.logout);
 
-userRouter.get("/getCards", userController.getCards);
+userRouter.post("/getCards", userController.getCards);
 
 userRouter.get("/menuCards/:id", userController.getMenuCards)
 

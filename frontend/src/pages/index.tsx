@@ -7,15 +7,17 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import ResturantCards from "@/components/resturantCards";
 import SliderCard from "@/components/sliderCard";
+import userStoreInstance from "@/store/userStore";
 
 const inter = Inter({ subsets: ["latin"] });
-export interface tsUser {
-  user_name: string;
-  email: string;
-  phone_number: string;
-}
+// export interface tsUser {
+//   user_name: string;
+//   email: string;
+//   phone_number: string;
+// }
 
 export default function Home() {
+
   return (
     <>
       <SliderCard />

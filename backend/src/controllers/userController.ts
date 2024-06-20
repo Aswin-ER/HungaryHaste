@@ -171,11 +171,18 @@ const userController = {
   //Get all restaurants
   getCards: async (req: Request, res: Response) => {
     try {
+      const { location } = req.body;
+      console.log(location);
+      const latitude = location?.latitude;
+      const longitude = location?.longitude;
+
+      console.log(latitude, longitude);
+
       const userAgent =
         " Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
 
       const response = await axios.get(
-        "https://www.swiggy.com/dapi/restaurants/list/v5?lat=10.51600&lng=76.21570&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING",
+        `https://www.swiggy.com/dapi/restaurants/list/v5?lat=${latitude}&lng=${longitude}&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING`,
         {
           headers: {
             "User-Agent": userAgent,
@@ -195,12 +202,12 @@ const userController = {
         .json({ message: error.message || "Internal Server Error" });
     }
   },
- 
+
   //Get restaurant menus
   getMenuCards: async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
-            
+
       const userAgent =
         " Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
 

@@ -21,6 +21,7 @@ class UserStore implements TsUserStore {
     this.user = user;
     localStorage.setItem('userDet', JSON.stringify(user))
   };
+
 }
 
 const userStoreInstance = new UserStore();
