@@ -3,25 +3,29 @@ import React, { FC, ReactNode, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
-type LayoutProps = {
-  children: ReactNode;
-};
+// type LayoutProps = {
+//   children: ReactNode;
+// };
 
-const Layout: FC<LayoutProps> = ({ children }) => {
-  const [isLoggedIn, setisLoggedIn] = useState("");
+const Layout = () => {
+  const [isLoggedIn, setisLoggedIn] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const userDetails: any = localStorage.getItem("userDet");
 
+    console.log(userDetails, "userDetails");
+
     if (!userDetails) {
+      console.log("No user details !!!!");
+      setisLoggedIn(false);
       return;
     }
-    const { user_name } = JSON.parse(userDetails);
+    // const { user_name } = JSON.parse(userDetails);
 
-    setisLoggedIn(user_name);
-    console.log(userDetails, "userDetails");
-  }, []);
+    setisLoggedIn(true);
+    
+  }, [isLoggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem("userDet");
@@ -31,7 +35,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
       .then((res) => {
         if (res.status === 200) {
           toast.success(res?.data?.message);
-          setisLoggedIn("");
+          setisLoggedIn(false);
           setTimeout(() => {
             router.push("/");
           }, 3000);
@@ -138,7 +142,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
           </div>
         </div>
       </nav>
-      <main>{children}</main>
+      {/* <main>{children}</main> */}
     </>
   );
 };

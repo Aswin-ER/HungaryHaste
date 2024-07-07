@@ -2,6 +2,8 @@
 import instance from "@/utils/axios";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 const HotelDetail = () => {
   const router = useRouter();
@@ -11,10 +13,13 @@ const HotelDetail = () => {
   const [menu2, setMenu2] = useState<any>([]);
   const [menu3, setMenu3] = useState<any>([]);
 
+  const [loading, setloading] = useState(false);
+
   useEffect(() => {
     if (id) {
       const fetchHotelDetails = async () => {
         try {
+          setloading(true);
           const response: any = await instance.get(`/menuCards/${id}`);
 
           if (response.status === 200) {
@@ -33,10 +38,6 @@ const HotelDetail = () => {
               response?.data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR
                 ?.cards;
             setMenu2(fetchedMenus2);
-            // setTitle2(
-            //   response?.data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR
-            //     ?.cards?.card?.card?.title
-            // );
 
             // categories Menus
             const fetchedMenus3: any =
@@ -44,7 +45,8 @@ const HotelDetail = () => {
                 ?.cards;
             console.log(fetchedMenus3, "categories menus");
             setMenu3(fetchedMenus3);
-            // setTitle3(fetchedMenus3[3]?.card?.card?.title);
+
+            setloading(false);
           } else {
             console.error("Unexpected response status:", response.status);
           }
@@ -71,7 +73,15 @@ const HotelDetail = () => {
     }
   };
 
-  return (
+  return loading ? (
+    <>
+      <div className="container mx-auto p-4 bg-white mt-12 ml-8 flex justify-center items-center min-h-screen">
+        <div className="flex justify-center items-center">
+          <FontAwesomeIcon icon={faSpinner} spin size="4x" />
+        </div>
+      </div>
+    </>
+  ) : (
     <>
       <div className="container mx-auto p-4 bg-white mt-12 ml-8">
         <h1 className="text-3xl font-bold mb-4">{hotel?.name}</h1>

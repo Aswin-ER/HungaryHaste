@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import cookieParser from "cookie-parser";
 import routes from "./routes/userRoute";
 import dotenv from "dotenv";
+import client from './utils/redisConfig';
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -33,6 +34,19 @@ app.use(
   })
 );
 
+app.use(bodyParser.json());
+app.use("/api", routes);
+
+// Example usage of the Redis client
+client.set('hello', 'hello').then((res)=> {
+  console.log(res,"sdfsdf");
+  
+}).catch((err)=> {
+  console.log(err, "redis error!!!");
+  
+})
+
+
 app.use((err: any, req: any, res: any, next: any) => {
   if (err) {
     console.table(err);
@@ -43,9 +57,6 @@ app.use((err: any, req: any, res: any, next: any) => {
     next();
   }
 });
-
-app.use(bodyParser.json());
-app.use("/api", routes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

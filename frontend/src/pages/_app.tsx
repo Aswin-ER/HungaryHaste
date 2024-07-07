@@ -12,7 +12,6 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Provider userStore={userStoreInstance}>
-        <Layout>
           <ToastContainer theme="dark" autoClose={3000} />
           <Head>
             <script
@@ -21,7 +20,6 @@ export default function App({ Component, pageProps }: AppProps) {
             />
           </Head>
           <Component {...pageProps} />
-        </Layout>
       </Provider>
     </>
   );

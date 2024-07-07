@@ -31,7 +31,8 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.0",
-    "pg": "^8.11.5"
+    "pg": "^8.11.5",
+    "redis": "^4.6.15"
   },
   "name": "backend",
   "version": "1.0.0",
