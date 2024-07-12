@@ -1,12 +1,10 @@
 import jwt from "jsonwebtoken";
-const crypto = require("crypto");
-
 interface tsToken {
   access_token: string;
   refresh_token: string;
 }
 
-const funJwt = (user_name: string) => {
+export const funJwt = (user_name: string) => {
   if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined");
   }
@@ -24,9 +22,8 @@ const funJwt = (user_name: string) => {
   const refresh_token = jwt.sign(
     { user_name },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: '3d'}
+    { expiresIn: "3d" }
   );
-
 
   // setting tokens
   const tokens: tsToken = {
@@ -34,8 +31,19 @@ const funJwt = (user_name: string) => {
     refresh_token: refresh_token,
   };
 
-
   return { tokens: tokens };
 };
 
-export default funJwt;
+export const verifyRefershToken = async (token: any) => {
+  try {
+    if (!token) {
+      throw new Error("Token is not defined");
+    }
+    const decode: any = jwt.decode(token, { complete: true });
+    console.log({ decode });
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return null;
+  }
+};
+

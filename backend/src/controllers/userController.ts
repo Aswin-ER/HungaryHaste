@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import User, { UserTs } from "../service/userServices";
 import bcrypt from "bcrypt";
-import funJwt from "../utils/funJwt";
+import { funJwt, verifyRefershToken } from "../utils/funJwt";
 import axios from "axios";
+import client from "../utils/redisConfig";
 
 const userController = {
   // Signup user
@@ -109,6 +110,24 @@ const userController = {
   //Refersh token
   refreshToken: async (req: Request, res: Response) => {
     try {
+      const existingRefershToken = req.cookies.refreshToken;
+
+      if (!existingRefershToken) {
+        return res.status(400).json({
+          success: false,
+          message: "Refresh token not found!",
+        });
+      }
+
+      const isValid = await verifyRefershToken(existingRefershToken);
+
+      if (!isValid) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid refresh token!",
+        });
+      }
+
       const { user_name } = req.body;
 
       const { tokens } = await funJwt(user_name);
@@ -179,7 +198,15 @@ const userController = {
       console.log(latitude, longitude);
 
       const userAgent =
-        " Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
+        "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
+
+      const cacheKey = `restaurants:${location}`;
+      const cachedData = await client.get(cacheKey);
+
+      if (cachedData) {
+        console.log("Cache hit");
+        return res.json(JSON.parse(cachedData));
+      }
 
       const response = await axios.get(
         `https://www.swiggy.com/dapi/restaurants/list/v5?lat=${latitude}&lng=${longitude}&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING`,
@@ -192,6 +219,9 @@ const userController = {
       );
 
       if (response.status === 200) {
+        await client.set(cacheKey, JSON.stringify(response.data), {
+          EX: 3600, //cache for one hour
+        });
         res.json(response.data);
       } else {
         res.status(response.status).json({ message: "Failed to fetch data" });
