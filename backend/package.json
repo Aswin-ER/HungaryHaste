@@ -13,12 +13,12 @@
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.12.7",
     "@types/pg": "^8.11.5",
-    "prisma": "^5.13.0",
+    "prisma": "^5.16.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@prisma/client": "^5.13.0",
+    "@prisma/client": "^5.16.2",
     "@types/cookie-parser": "^1.4.7",
     "axios": "^1.7.0",
     "bcrypt": "^5.1.1",
